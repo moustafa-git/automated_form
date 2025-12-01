@@ -18,6 +18,13 @@ ENV/
 .env
 .env.local
 
+# Credentials and secrets (NEVER commit these!)
+format_credentials.py
+*credentials*.json
+*credentials*.py
+*secret*.json
+*secret*.py
+
 # IDE
 .vscode/
 .idea/
