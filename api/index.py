@@ -1,22 +1,13 @@
 import sys
 import os
 from pathlib import Path
+from io import BytesIO
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-try:
-    from flask import Flask, render_template, request, redirect, url_for
-    from sheets_handler import append_to_sheets
-except ImportError as e:
-    # If imports fail, return error immediately
-    def handler(req):
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'text/plain'},
-            'body': f'Import error: {str(e)}'
-        }
-    raise
+from flask import Flask, render_template, request, redirect, url_for
+from sheets_handler import append_to_sheets
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -67,46 +58,53 @@ def submit():
 def handler(req):
     """Handle Vercel serverless function requests"""
     try:
-        # Convert Vercel request to WSGI environ
-        from io import BytesIO
+        # Get request details
+        method = req.method or 'GET'
+        path = req.path or '/'
+        headers = req.headers or {}
+        body = req.body or b''
         
+        # Parse query string
+        query_string = ''
+        if '?' in path:
+            path, query_string = path.split('?', 1)
+        
+        # Build WSGI environ
         environ = {
-            'REQUEST_METHOD': req.method or 'GET',
-            'PATH_INFO': req.path or '/',
-            'QUERY_STRING': '',
-            'CONTENT_TYPE': req.headers.get('content-type', ''),
-            'CONTENT_LENGTH': str(len(req.body or b'')),
+            'REQUEST_METHOD': method,
+            'PATH_INFO': path,
+            'QUERY_STRING': query_string,
+            'CONTENT_TYPE': headers.get('content-type', ''),
+            'CONTENT_LENGTH': str(len(body)),
             'SERVER_NAME': 'localhost',
             'SERVER_PORT': '80',
             'wsgi.version': (1, 0),
             'wsgi.url_scheme': 'https',
-            'wsgi.input': BytesIO(req.body.encode() if isinstance(req.body, str) else (req.body or b'')),
+            'wsgi.input': BytesIO(body if isinstance(body, bytes) else body.encode()),
             'wsgi.errors': sys.stderr,
             'wsgi.multithread': False,
             'wsgi.multiprocess': False,
             'wsgi.run_once': False,
         }
         
-        # Add headers to environ
-        for key, value in (req.headers or {}).items():
+        # Add HTTP headers to environ
+        for key, value in headers.items():
             key_upper = key.upper().replace('-', '_')
             if key_upper not in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
                 environ[f'HTTP_{key_upper}'] = value
         
-        # Handle query string
-        if '?' in req.path:
-            path, query = req.path.split('?', 1)
-            environ['PATH_INFO'] = path
-            environ['QUERY_STRING'] = query
-        
-        # Call Flask app
+        # Create request context and dispatch
         with app.request_context(environ):
             response = app.full_dispatch_request()
             
+            # Convert Flask response to Vercel format
+            response_headers = dict(response.headers)
+            response_body = response.get_data(as_text=True)
+            
             return {
                 'statusCode': response.status_code,
-                'headers': dict(response.headers),
-                'body': response.get_data(as_text=True)
+                'headers': response_headers,
+                'body': response_body
             }
             
     except Exception as e:

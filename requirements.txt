@@ -3,6 +3,5 @@ openpyxl
 gunicorn
 gspread
 google-auth
-serverless-http
 
 
