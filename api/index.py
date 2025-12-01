@@ -54,15 +54,19 @@ def submit():
         error_msg = f"Error: {str(e)}\n\nTraceback:\n{traceback.format_exc()}"
         return error_msg, 500
 
-# Vercel serverless function handler
-def handler(req):
-    """Handle Vercel serverless function requests"""
+# Vercel serverless function handler - must be a simple function
+def handler(request):
+    """Vercel serverless function handler"""
     try:
-        # Get request details
-        method = req.method or 'GET'
-        path = req.path or '/'
-        headers = req.headers or {}
-        body = req.body or b''
+        # Get request properties safely
+        method = getattr(request, 'method', 'GET') or 'GET'
+        path = getattr(request, 'path', '/') or '/'
+        headers = getattr(request, 'headers', {}) or {}
+        body = getattr(request, 'body', b'') or b''
+        
+        # Handle string body
+        if isinstance(body, str):
+            body = body.encode('utf-8')
         
         # Parse query string
         query_string = ''
@@ -80,38 +84,33 @@ def handler(req):
             'SERVER_PORT': '80',
             'wsgi.version': (1, 0),
             'wsgi.url_scheme': 'https',
-            'wsgi.input': BytesIO(body if isinstance(body, bytes) else body.encode()),
+            'wsgi.input': BytesIO(body),
             'wsgi.errors': sys.stderr,
             'wsgi.multithread': False,
             'wsgi.multiprocess': False,
             'wsgi.run_once': False,
         }
         
-        # Add HTTP headers to environ
+        # Add HTTP headers
         for key, value in headers.items():
             key_upper = key.upper().replace('-', '_')
             if key_upper not in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
                 environ[f'HTTP_{key_upper}'] = value
         
-        # Create request context and dispatch
+        # Dispatch request
         with app.request_context(environ):
             response = app.full_dispatch_request()
             
-            # Convert Flask response to Vercel format
-            response_headers = dict(response.headers)
-            response_body = response.get_data(as_text=True)
-            
             return {
                 'statusCode': response.status_code,
-                'headers': response_headers,
-                'body': response_body
+                'headers': dict(response.headers),
+                'body': response.get_data(as_text=True)
             }
             
     except Exception as e:
         import traceback
-        error_trace = traceback.format_exc()
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'text/plain'},
-            'body': f"Internal Server Error\n\nError: {str(e)}\n\n{error_trace}"
+            'body': f"Error: {str(e)}\n\n{traceback.format_exc()}"
         }
