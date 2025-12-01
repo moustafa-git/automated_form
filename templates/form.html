@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Observation Report Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 24px 32px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .title-block {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .title-block h1 {
+            margin: 4px 0;
+            font-size: 20px;
+        }
+
+        .title-block h2 {
+            margin: 2px 0;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .title-block h3 {
+            margin: 8px 0 0;
+            font-size: 18px;
+        }
+
+        .subtitle-ar {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .section-header {
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header span {
+            font-size: 13px;
+            color: #666;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .label-secondary {
+            font-weight: normal;
+            font-size: 12px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 7px 8px;
+            margin-top: 4px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            font-size: 13px;
+        }
+
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .row > div {
+            flex: 1;
+        }
+
+        .footer-row {
+            margin-top: 18px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-row > div {
+            flex: 1;
+        }
+
+        button[type="submit"] {
+            margin-top: 22px;
+            padding: 10px 24px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="title-block">
+        <h1>Observation Report</h1>
+        <div class="subtitle-ar">تقرير الملاحظة</div>
+        <h3>Title (brief description of observation)</h3>
+    </div>
+
+    <form method="post" action="/submit">
+        <label for="title">
+            Title
+            <span class="label-secondary">/ موضوع عنيف ملاحظتك، وصف مختصر للملاحظة</span>
+        </label>
+        <input type="text" id="title" name="title" required>
+
+        <div class="section-header">
+            <div>Safe act / condition observed</div>
+            <span>التصرفات / الظروف الآمنة التي تم ملاحظتها</span>
+        </div>
+        <textarea id="safe_act" name="safe_act"></textarea>
+
+        <label for="positive_action">
+            Action taken to encourage continued safe performance
+            <span class="label-secondary">الإجراء المتخذ لتشجيع الاستمرار في الأداء الآمن</span>
+        </label>
+        <textarea id="positive_action" name="positive_action"></textarea>
+
+        <div class="section-header">
+            <div>Unsafe act / condition observed</div>
+            <span>التصرفات / الظروف غير الآمنة التي تم ملاحظتها</span>
+        </div>
+        <textarea id="unsafe_act" name="unsafe_act"></textarea>
+
+        <label for="immediate_corrective">
+            Immediate corrective action
+            <span class="label-secondary">الإجراء الفوري المتخذ</span>
+        </label>
+        <textarea id="immediate_corrective" name="immediate_corrective"></textarea>
+
+        <label for="preventive_action">
+            Action to prevent recurrence &amp; agreement reached
+            <span class="label-secondary">الإجراءات و الاتفاقات التي تم التوصل إليها لمنع تكرار الحادث</span>
+        </label>
+        <textarea id="preventive_action" name="preventive_action"></textarea>
+
+        <div class="footer-row">
+            <div>
+                <label for="observer">Observer / الملاحظ</label>
+                <input type="text" id="observer" name="observer">
+            </div>
+            <div>
+                <label for="company">Company / الشركة</label>
+                <input type="text" id="company" name="company">
+            </div>
+        </div>
+
+        <div class="footer-row">
+            <div>
+                <label for="date_occurred">Date Occurred / التاريخ</label>
+                <input type="date" id="date_occurred" name="date_occurred">
+            </div>
+            <div>
+                <label for="location_area">Location / Area / الموقع</label>
+                <input type="text" id="location_area" name="location_area">
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 24px;">
+            <div>Tracker Fields</div>
+            <span>حقول المتابعة (للتوافق مع ملف الإكسل)</span>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="trade_position">Trade / Position</label>
+                <input type="text" id="trade_position" name="trade_position">
+            </div>
+            <div>
+                <label for="observation_group">Observation Group</label>
+                <input type="text" id="observation_group" name="observation_group">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="observation_type">Observation Type</label>
+                <input type="text" id="observation_type" name="observation_type">
+            </div>
+            <div>
+                <label for="priority">Priority</label>
+                <input type="text" id="priority" name="priority">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="risk_rating">Risk Rating</label>
+                <input type="text" id="risk_rating" name="risk_rating">
+            </div>
+            <div>
+                <label for="custodian">Custodian</label>
+                <input type="text" id="custodian" name="custodian">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="due_date">Due Date</label>
+                <input type="date" id="due_date" name="due_date">
+            </div>
+            <div>
+                <label for="status">Status</label>
+                <input type="text" id="status" name="status">
+            </div>
+        </div>
+
+        <label for="observation">Observation (summary)</label>
+        <textarea id="observation" name="observation"></textarea>
+
+        <label for="action">Action</label>
+        <textarea id="action" name="action"></textarea>
+
+        <label for="action_taken">Action Taken</label>
+        <textarea id="action_taken" name="action_taken"></textarea>
+
+        <label for="corrective_preventive_action">Corrective Action / Preventive Action</label>
+        <textarea id="corrective_preventive_action" name="corrective_preventive_action"></textarea>
+
+        <label for="comment">Comment</label>
+        <textarea id="comment" name="comment"></textarea>
+
+        <button type="submit">Submit Observation</button>
+    </form>
+</div>
+</body>
+</html>
